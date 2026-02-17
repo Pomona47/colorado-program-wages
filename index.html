@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Colorado Program Wages Navigator</title>
+  <style>
+    :root {
+      --blue: #003087;
+      --gold: #C8962E;
+      --light: #f5f7fa;
+      --border: #dde2ea;
+      --text: #1a1a2e;
+      --muted: #6b7280;
+      --green: #16a34a;
+      --red: #dc2626;
+      --card-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--light); color: var(--text); }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, var(--blue) 0%, #1a3a6e 100%);
+      color: white; padding: 0;
+    }
+    .header-inner {
+      max-width: 1300px; margin: 0 auto;
+      padding: 24px 24px 0;
+    }
+    .header-top { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
+    .header-badge {
+      background: var(--gold); color: white;
+      font-size: 11px; font-weight: 700; letter-spacing: 1px;
+      padding: 4px 10px; border-radius: 20px; text-transform: uppercase;
+    }
+    header h1 { font-size: clamp(22px, 3vw, 32px); font-weight: 800; line-height: 1.2; }
+    header p.subtitle { color: rgba(255,255,255,0.78); font-size: 15px; margin-top: 6px; }
+
+    /* ── Tab Bar ── */
+    .tab-bar {
+      display: flex; gap: 4px;
+      max-width: 1300px; margin: 0 auto;
+      padding: 0 24px; margin-top: 20px;
+    }
+    .tab-btn {
+      padding: 10px 20px; border: none; cursor: pointer;
+      border-radius: 8px 8px 0 0; font-size: 14px; font-weight: 600;
+      background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.8);
+      transition: all 0.2s;
+    }
+    .tab-btn:hover { background: rgba(255,255,255,0.25); color: white; }
+    .tab-btn.active { background: var(--light); color: var(--blue); }
+
+    /* ── Main ── */
+    main { max-width: 1300px; margin: 0 auto; padding: 24px; }
+
+    /* ── Search Panel ── */
+    .search-panel {
+      background: white; border-radius: 12px;
+      box-shadow: var(--card-shadow); padding: 24px; margin-bottom: 20px;
+    }
+    .search-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 14px; align-items: end;
+    }
+    @media (max-width: 900px) {
+      .search-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 560px) {
+      .search-grid { grid-template-columns: 1fr; }
+    }
+    label.field-label {
+      display: block; font-size: 12px; font-weight: 600;
+      color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    input[type=text], select {
+      width: 100%; padding: 10px 14px; border: 1.5px solid var(--border);
+      border-radius: 8px; font-size: 14px; color: var(--text);
+      background: white; outline: none; transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    input[type=text]:focus, select:focus { border-color: var(--blue); }
+    select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+    .btn-primary {
+      width: 100%; padding: 11px 20px;
+      background: var(--blue); color: white; border: none;
+      border-radius: 8px; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: background 0.2s; letter-spacing: 0.3px;
+    }
+    .btn-primary:hover { background: #00236b; }
+    .btn-ghost {
+      padding: 11px 20px; background: transparent;
+      color: var(--muted); border: 1.5px solid var(--border);
+      border-radius: 8px; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-ghost:hover { border-color: var(--blue); color: var(--blue); }
+
+    /* ── Stats Bar ── */
+    .stats-bar {
+      display: flex; gap: 12px; flex-wrap: wrap;
+      margin-bottom: 16px; align-items: center;
+    }
+    .stat-chip {
+      background: white; border: 1px solid var(--border);
+      border-radius: 20px; padding: 5px 14px;
+      font-size: 13px; color: var(--muted); font-weight: 500;
+    }
+    .stat-chip strong { color: var(--text); }
+    .view-toggle { margin-left: auto; display: flex; gap: 6px; }
+    .view-btn {
+      padding: 6px 14px; border-radius: 6px; border: 1.5px solid var(--border);
+      background: white; font-size: 13px; font-weight: 600; cursor: pointer;
+      color: var(--muted); transition: all 0.15s;
+    }
+    .view-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
+
+    /* ── Compare Bar ── */
+    .compare-bar {
+      background: white; border-radius: 12px;
+      box-shadow: var(--card-shadow); padding: 16px 24px;
+      margin-bottom: 16px; display: none; align-items: center; gap: 12px;
+      flex-wrap: wrap;
+    }
+    .compare-bar.visible { display: flex; }
+    .compare-bar strong { color: var(--blue); font-size: 14px; }
+    .compare-chips { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
+    .compare-chip {
+      display: flex; align-items: center; gap: 6px;
+      background: #e8edf7; border-radius: 20px;
+      padding: 5px 12px; font-size: 13px; font-weight: 600; color: var(--blue);
+    }
+    .compare-chip button {
+      background: none; border: none; cursor: pointer;
+      color: var(--blue); font-size: 16px; line-height: 1; padding: 0;
+      opacity: 0.6;
+    }
+    .compare-chip button:hover { opacity: 1; }
+    .btn-compare-go {
+      padding: 9px 20px; background: var(--gold); color: white;
+      border: none; border-radius: 8px; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: background 0.2s; white-space: nowrap;
+    }
+    .btn-compare-go:hover { background: #a87520; }
+
+    /* ── Results Grid ── */
+    #results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 16px;
+    }
+    #results-grid.list-view { grid-template-columns: 1fr; }
+
+    .program-card {
+      background: white; border-radius: 12px;
+      box-shadow: var(--card-shadow); padding: 20px;
+      border: 2px solid transparent; cursor: pointer;
+      transition: all 0.2s; position: relative;
+    }
+    .program-card:hover { border-color: var(--blue); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+    .program-card.selected { border-color: var(--gold); background: #fffdf5; }
+    .program-card.list-view { display: flex; gap: 20px; align-items: center; padding: 16px 20px; }
+
+    .card-select-badge {
+      position: absolute; top: 12px; right: 12px;
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 2px solid var(--border); background: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; transition: all 0.2s;
+    }
+    .program-card.selected .card-select-badge {
+      background: var(--gold); border-color: var(--gold); color: white;
+    }
+
+    .card-school { font-size: 12px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+    .card-program { font-size: 16px; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 6px; padding-right: 28px; }
+    .card-credential { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 12px; }
+    .cred-cert-short { background: #fef3c7; color: #92400e; }
+    .cred-cert-long  { background: #dbeafe; color: #1e40af; }
+    .cred-aas        { background: #d1fae5; color: #065f46; }
+    .cred-aa         { background: #ede9fe; color: #4c1d95; }
+    .cred-ags        { background: #fce7f3; color: #9d174d; }
+    .cred-bach       { background: #e0f2fe; color: #0c4a6e; }
+    .cred-master     { background: #fdf2f8; color: #701a75; }
+    .cred-default    { background: #f3f4f6; color: #374151; }
+
+    .wages-row { display: flex; gap: 8px; }
+    .wage-box {
+      flex: 1; background: var(--light); border-radius: 8px;
+      padding: 10px 8px; text-align: center;
+    }
+    .wage-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+    .wage-value { font-size: 17px; font-weight: 800; color: var(--text); margin-top: 2px; }
+    .wage-year  { font-size: 10px; color: var(--muted); margin-top: 1px; }
+    .wage-highlight { background: #e8f4ff; }
+    .wage-highlight .wage-value { color: var(--blue); }
+
+    .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 12px; color: var(--muted); }
+    .card-cip { font-size: 11px; color: var(--muted); }
+
+    /* List view specifics */
+    .list-view .program-card .card-left { min-width: 260px; flex: 1; }
+    .list-view .program-card .wages-row { min-width: 360px; }
+    @media (max-width: 700px) { .list-view .program-card { flex-direction: column; } }
+
+    /* ── No results ── */
+    .empty-state {
+      text-align: center; padding: 60px 20px;
+      color: var(--muted); grid-column: 1 / -1;
+    }
+    .empty-state svg { margin-bottom: 16px; opacity: 0.3; }
+    .empty-state h3 { font-size: 20px; color: var(--text); margin-bottom: 8px; }
+
+    /* ── Load more ── */
+    #load-more-wrap { text-align: center; margin-top: 24px; }
+    .btn-load-more {
+      padding: 12px 32px; background: white; color: var(--blue);
+      border: 2px solid var(--blue); border-radius: 8px;
+      font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-load-more:hover { background: var(--blue); color: white; }
+
+    /* ── Compare Modal ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); z-index: 100;
+      align-items: flex-start; justify-content: center;
+      padding: 40px 16px; overflow-y: auto;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: white; border-radius: 16px;
+      width: 100%; max-width: 1100px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      overflow: hidden;
+    }
+    .modal-header {
+      background: var(--blue); color: white;
+      padding: 20px 28px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-header h2 { font-size: 20px; font-weight: 800; }
+    .modal-close {
+      background: rgba(255,255,255,0.2); border: none; color: white;
+      width: 36px; height: 36px; border-radius: 50%; font-size: 20px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.35); }
+    .modal-body { padding: 28px; overflow-x: auto; }
+
+    /* Compare Table */
+    .compare-table { width: 100%; border-collapse: collapse; min-width: 600px; }
+    .compare-table th {
+      text-align: left; padding: 14px 16px;
+      background: var(--light); font-size: 13px; font-weight: 700;
+      color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px;
+      border-bottom: 2px solid var(--border);
+    }
+    .compare-table th:not(:first-child) { text-align: center; background: #e8edf7; color: var(--blue); }
+    .compare-table td { padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table td:not(:first-child) { text-align: center; }
+    .compare-table tr.section-header td {
+      background: var(--light); font-weight: 700; color: var(--muted);
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px;
+      padding: 10px 16px; border-top: 2px solid var(--border);
+    }
+    .big-wage { font-size: 22px; font-weight: 800; color: var(--blue); }
+    .wage-range { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .best-cell { background: #f0fdf4; }
+    .best-cell .big-wage { color: var(--green); }
+    .row-label { font-size: 14px; font-weight: 600; color: var(--text); }
+    .row-sublabel { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    /* ── Insights Tab ── */
+    #tab-insights { display: none; }
+    .insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 700px) { .insights-grid { grid-template-columns: 1fr; } }
+    .insight-card { background: white; border-radius: 12px; box-shadow: var(--card-shadow); padding: 24px; }
+    .insight-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--blue); }
+    .rank-list { list-style: none; }
+    .rank-list li {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+    }
+    .rank-list li:last-child { border-bottom: none; }
+    .rank-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--light); display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 800; color: var(--blue); flex-shrink: 0;
+    }
+    .rank-num.gold { background: var(--gold); color: white; }
+    .rank-info { flex: 1; min-width: 0; }
+    .rank-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rank-sub { font-size: 12px; color: var(--muted); }
+    .rank-wage { font-size: 16px; font-weight: 800; color: var(--blue); flex-shrink: 0; }
+    .trend-bar-wrap { margin-bottom: 12px; }
+    .trend-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+    .trend-bar { height: 10px; border-radius: 6px; background: var(--border); overflow: hidden; }
+    .trend-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--blue), #4f8ef7); transition: width 0.8s ease; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center; padding: 24px; color: var(--muted);
+      font-size: 12px; border-top: 1px solid var(--border); margin-top: 40px;
+    }
+
+    /* ── Spinner ── */
+    .spinner {
+      display: none; text-align: center; padding: 40px;
+      grid-column: 1 / -1; color: var(--muted);
+    }
+    .spinner.visible { display: block; }
+
+    /* ── Tooltip ── */
+    [data-tip] { position: relative; cursor: help; }
+    [data-tip]::after {
+      content: attr(data-tip);
+      position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%);
+      background: #1a1a2e; color: white; font-size: 12px; font-weight: 400;
+      padding: 6px 10px; border-radius: 6px; white-space: nowrap;
+      pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 10;
+    }
+    [data-tip]:hover::after { opacity: 1; }
+
+    /* ── Wage bar visual ── */
+    .wage-bar-mini { height: 4px; border-radius: 2px; background: var(--border); margin-top: 4px; overflow: hidden; }
+    .wage-bar-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--blue), #4f8ef7); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-top">
+      <span class="header-badge">Colorado 2025</span>
+    </div>
+    <h1>Program Wages &amp; Outcomes Navigator</h1>
+    <p class="subtitle">Compare real earnings data for graduates of Colorado colleges &amp; universities — 1, 5, and 10 years after completion</p>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('search')">&#128269; Search &amp; Compare</button>
+    <button class="tab-btn" onclick="switchTab('insights')">&#128200; Insights</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ── SEARCH TAB ── -->
+  <div id="tab-search">
+
+    <div class="search-panel">
+      <div class="search-grid">
+        <div>
+          <label class="field-label">Search Programs or Schools</label>
+          <input type="text" id="q" placeholder="e.g. nursing, computer science, Pueblo..." oninput="onSearch()" autocomplete="off" />
+        </div>
+        <div>
+          <label class="field-label">Field of Study</label>
+          <select id="filter-field" onchange="onSearch()">
+            <option value="">All Fields</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">Credential Type</label>
+          <select id="filter-cred" onchange="onSearch()">
+            <option value="">All Credentials</option>
+            <option value="Certificate(<1 year)">Certificate (&lt;1 Year)</option>
+            <option value="Certificate(>1 year)">Certificate (&gt;1 Year)</option>
+            <option value="Associate of Applied Science">AAS</option>
+            <option value="Associate Degree(AA or AS)">AA / AS</option>
+            <option value="Associate of General Studies">AGS</option>
+            <option value="Bachelor's Degree">Bachelor's Degree</option>
+            <option value="Master's Degree">Master's Degree</option>
+          </select>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <div style="flex:1">
+            <label class="field-label">Sort By</label>
+            <select id="sort-by" onchange="onSearch()">
+              <option value="median1">Year 1 Median</option>
+              <option value="median5">Year 5 Median</option>
+              <option value="median10">Year 10 Median</option>
+              <option value="growth">Wage Growth</option>
+              <option value="alpha">A–Z</option>
+            </select>
+          </div>
+          <div style="padding-top:20px;">
+            <button class="btn-ghost" onclick="clearFilters()">Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compare Bar -->
+    <div class="compare-bar" id="compare-bar">
+      <strong>Compare:</strong>
+      <div class="compare-chips" id="compare-chips"></div>
+      <button class="btn-compare-go" onclick="openCompareModal()">Compare Side-by-Side &#8594;</button>
+      <button class="btn-ghost" onclick="clearCompare()">Clear</button>
+    </div>
+
+    <!-- Stats + View toggle -->
+    <div class="stats-bar">
+      <div class="stat-chip">Showing <strong id="result-count">—</strong> programs</div>
+      <div class="stat-chip" id="stat-median-chip" style="display:none">Median: <strong id="stat-median">—</strong></div>
+      <div class="view-toggle">
+        <button class="view-btn active" id="vbtn-grid" onclick="setView('grid')">&#9638; Grid</button>
+        <button class="view-btn" id="vbtn-list" onclick="setView('list')">&#9776; List</button>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div id="results-grid"></div>
+    <div id="load-more-wrap" style="display:none">
+      <button class="btn-load-more" onclick="loadMore()">Load More Programs</button>
+    </div>
+
+  </div><!-- /tab-search -->
+
+  <!-- ── INSIGHTS TAB ── -->
+  <div id="tab-insights" style="display:none">
+    <div class="insights-grid">
+      <div class="insight-card">
+        <h3>&#127942; Top 10 Programs by Year 1 Earnings</h3>
+        <ul class="rank-list" id="top-yr1"></ul>
+      </div>
+      <div class="insight-card">
+        <h3>&#128640; Top 10 Programs by Year 10 Earnings</h3>
+        <ul class="rank-list" id="top-yr10"></ul>
+      </div>
+      <div class="insight-card">
+        <h3>&#128200; Highest Wage Growth (Yr 1 &#8594; 10)</h3>
+        <ul class="rank-list" id="top-growth"></ul>
+      </div>
+      <div class="insight-card">
+        <h3>&#127979; Average Median Wage by Field (Year 5)</h3>
+        <div id="field-bars"></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── COMPARE MODAL ── -->
+<div class="modal-overlay" id="compare-modal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Side-by-Side Program Comparison</h2>
+      <button class="modal-close" onclick="closeCompareModal()">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div id="compare-table-wrap"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Data source: Colorado Department of Higher Education &mdash; 2025 Wage Outcomes Report &nbsp;|&nbsp;
+  Earnings reflect graduates with wage records in Colorado. &ldquo;Insufficient Data&rdquo; rows have been excluded.
+</footer>
+
+<script src="data.js"></script>
+<script>
+// ─────────────────────────────────────────────
+//  DATA PREP
+// ─────────────────────────────────────────────
+const RECORDS = APP_DATA.records;
+
+// Build program index: key = entityId + '|' + cipCode + '|' + degreeLevel
+// Each entry aggregates Year 1 / 5 / 10
+const programMap = {};
+RECORDS.forEach(r => {
+  const key = `${r['Entity ID']}|${r['CIP Code']}|${r['Degree Level ID']}`;
+  if (!programMap[key]) {
+    programMap[key] = {
+      key,
+      school: r['Entity Name'],
+      program: cleanCIPTitle(r['CIP Title']),
+      cipCode: r['CIP Code'],
+      cipTitle: r['CIP Title'],
+      field: r['ROI Report Group'],
+      degree: r['Degree'],
+      degreeId: r['Degree Level ID'],
+      completers1: null, median1: null, q1_1: null, q3_1: null,
+      completers5: null, median5: null, q1_5: null, q3_5: null,
+      completers10: null, median10: null, q1_10: null, q3_10: null,
+    };
+  }
+  const p = programMap[key];
+  if (r.year === 1)  { p.completers1  = r['Completers']; p.median1  = r['Annual Median Earnings ($)']; p.q1_1  = r['Annual QTILE1 Earnings ($)']; p.q3_1  = r['Annual QTILE3 Earnings ($)']; }
+  if (r.year === 5)  { p.completers5  = r['Completers']; p.median5  = r['Annual Median Earnings ($)']; p.q1_5  = r['Annual QTILE1 Earnings ($)']; p.q3_5  = r['Annual QTILE3 Earnings ($)']; }
+  if (r.year === 10) { p.completers10 = r['Completers']; p.median10 = r['Annual Median Earnings ($)']; p.q1_10 = r['Annual QTILE1 Earnings ($)']; p.q3_10 = r['Annual QTILE3 Earnings ($)']; }
+});
+
+function cleanCIPTitle(t) {
+  if (!t) return t;
+  // Remove trailing CIP code patterns like "(42.01)"
+  return t.replace(/\s*\(\d{2}\.\d{2,4}\)\s*$/, '').trim();
+}
+
+const PROGRAMS = Object.values(programMap);
+
+// Unique fields for filter
+const FIELDS = [...new Set(PROGRAMS.map(p => p.field).filter(Boolean))].sort();
+const fieldSel = document.getElementById('filter-field');
+FIELDS.forEach(f => {
+  const o = document.createElement('option'); o.value = f; o.textContent = f;
+  fieldSel.appendChild(o);
+});
+
+// ─────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────
+let currentView = 'grid';
+let compareSet = new Set(); // keys
+let filtered = [];
+let page = 0;
+const PAGE_SIZE = 30;
+let maxWage = 0;
+
+// ─────────────────────────────────────────────
+//  SEARCH / FILTER
+// ─────────────────────────────────────────────
+function onSearch() {
+  page = 0;
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  const field = document.getElementById('filter-field').value;
+  const cred = document.getElementById('filter-cred').value;
+  const sort = document.getElementById('sort-by').value;
+
+  filtered = PROGRAMS.filter(p => {
+    if (field && p.field !== field) return false;
+    if (cred && p.degree !== cred) return false;
+    if (q) {
+      const hay = `${p.school} ${p.program} ${p.cipTitle} ${p.field}`.toLowerCase();
+      if (!q.split(' ').every(w => hay.includes(w))) return false;
+    }
+    // Must have at least one wage data point
+    return p.median1 || p.median5 || p.median10;
+  });
+
+  // Sort
+  filtered.sort((a, b) => {
+    if (sort === 'median1')  return (b.median1  || 0) - (a.median1  || 0);
+    if (sort === 'median5')  return (b.median5  || 0) - (a.median5  || 0);
+    if (sort === 'median10') return (b.median10 || 0) - (a.median10 || 0);
+    if (sort === 'growth')   return growth(b) - growth(a);
+    if (sort === 'alpha')    return a.program.localeCompare(b.program);
+    return 0;
+  });
+
+  // Max wage for bar scaling
+  maxWage = Math.max(...filtered.map(p => p.median10 || p.median5 || p.median1 || 0), 1);
+
+  renderResults();
+}
+
+function growth(p) {
+  if (p.median1 && p.median10) return p.median10 - p.median1;
+  if (p.median1 && p.median5)  return p.median5  - p.median1;
+  return 0;
+}
+
+function clearFilters() {
+  document.getElementById('q').value = '';
+  document.getElementById('filter-field').value = '';
+  document.getElementById('filter-cred').value = '';
+  document.getElementById('sort-by').value = 'median1';
+  onSearch();
+}
+
+// ─────────────────────────────────────────────
+//  RENDER CARDS
+// ─────────────────────────────────────────────
+function renderResults() {
+  const grid = document.getElementById('results-grid');
+  grid.className = currentView === 'list' ? 'list-view' : '';
+
+  const slice = filtered.slice(0, (page + 1) * PAGE_SIZE);
+  const medians = filtered.filter(p => p.median1).map(p => p.median1);
+  const overallMedian = medians.length ? fmt(median(medians)) : null;
+
+  document.getElementById('result-count').textContent = filtered.length.toLocaleString();
+  const medChip = document.getElementById('stat-median-chip');
+  if (overallMedian) {
+    medChip.style.display = '';
+    document.getElementById('stat-median').textContent = overallMedian + ' (Yr 1)';
+  } else {
+    medChip.style.display = 'none';
+  }
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <h3>No programs found</h3>
+        <p>Try a broader search or clear some filters.</p>
+      </div>`;
+    document.getElementById('load-more-wrap').style.display = 'none';
+    return;
+  }
+
+  grid.innerHTML = slice.map(p => renderCard(p)).join('');
+  document.getElementById('load-more-wrap').style.display = filtered.length > slice.length ? '' : 'none';
+}
+
+function renderCard(p) {
+  const sel = compareSet.has(p.key);
+  const listCls = currentView === 'list' ? ' list-view' : '';
+  const selCls = sel ? ' selected' : '';
+  const credCls = credClass(p.degree);
+
+  const w1 = p.median1  ? fmt(p.median1)  : '—';
+  const w5 = p.median5  ? fmt(p.median5)  : '—';
+  const w10= p.median10 ? fmt(p.median10) : '—';
+  const barPct = Math.round(((p.median10 || p.median5 || p.median1 || 0) / maxWage) * 100);
+  const g = growth(p);
+  const growthStr = g > 0 ? `+${fmt(g)}` : g < 0 ? fmt(g) : '';
+
+  const cardContent = `
+    <div class="card-select-badge">${sel ? '&#10003;' : ''}</div>
+    <div class="card-left">
+      <div class="card-school">${esc(p.school)}</div>
+      <div class="card-program">${esc(p.program)}</div>
+      <span class="card-credential ${credCls}">${esc(p.degree)}</span>
+    </div>
+    <div style="flex:1">
+      <div class="wages-row">
+        <div class="wage-box">
+          <div class="wage-label" data-tip="Median earnings 1 year after graduation">Year 1</div>
+          <div class="wage-value">${w1}</div>
+          <div class="wage-year">median</div>
+        </div>
+        <div class="wage-box wage-highlight">
+          <div class="wage-label" data-tip="Median earnings 5 years after graduation">Year 5</div>
+          <div class="wage-value">${w5}</div>
+          <div class="wage-year">median</div>
+        </div>
+        <div class="wage-box">
+          <div class="wage-label" data-tip="Median earnings 10 years after graduation">Year 10</div>
+          <div class="wage-value">${w10}</div>
+          <div class="wage-year">median</div>
+        </div>
+      </div>
+      <div class="wage-bar-mini"><div class="wage-bar-fill" style="width:${barPct}%"></div></div>
+      <div class="card-footer">
+        <span class="card-cip">CIP ${p.cipCode} &middot; ${esc(p.field || '')}</span>
+        ${growthStr ? `<span style="color:var(--green);font-weight:700;font-size:12px">${growthStr} growth</span>` : ''}
+      </div>
+    </div>`;
+
+  return `<div class="program-card${listCls}${selCls}" onclick="toggleCompare('${esc(p.key)}')" data-key="${esc(p.key)}">${cardContent}</div>`;
+}
+
+function loadMore() { page++; renderResults(); }
+
+function setView(v) {
+  currentView = v;
+  document.getElementById('vbtn-grid').className = 'view-btn' + (v === 'grid' ? ' active' : '');
+  document.getElementById('vbtn-list').className = 'view-btn' + (v === 'list' ? ' active' : '');
+  renderResults();
+}
+
+// ─────────────────────────────────────────────
+//  COMPARE
+// ─────────────────────────────────────────────
+function toggleCompare(key) {
+  if (compareSet.has(key)) {
+    compareSet.delete(key);
+  } else {
+    if (compareSet.size >= 5) { alert('You can compare up to 5 programs at a time.'); return; }
+    compareSet.add(key);
+  }
+  updateCompareBar();
+  // Update card highlight without full re-render
+  document.querySelectorAll('.program-card').forEach(el => {
+    const k = el.dataset.key;
+    const badge = el.querySelector('.card-select-badge');
+    if (compareSet.has(k)) {
+      el.classList.add('selected');
+      badge.innerHTML = '&#10003;';
+    } else {
+      el.classList.remove('selected');
+      badge.innerHTML = '';
+    }
+  });
+}
+
+function updateCompareBar() {
+  const bar = document.getElementById('compare-bar');
+  const chips = document.getElementById('compare-chips');
+  if (compareSet.size === 0) {
+    bar.classList.remove('visible'); return;
+  }
+  bar.classList.add('visible');
+  chips.innerHTML = [...compareSet].map(k => {
+    const p = programMap[k];
+    return `<span class="compare-chip">${esc(p ? p.program.slice(0,40) : k)}<button onclick="removeCompare('${k}',event)">&#x2715;</button></span>`;
+  }).join('');
+}
+
+function removeCompare(key, e) {
+  e.stopPropagation();
+  compareSet.delete(key);
+  updateCompareBar();
+  renderResults();
+}
+
+function clearCompare() {
+  compareSet.clear();
+  updateCompareBar();
+  renderResults();
+}
+
+function openCompareModal() {
+  if (compareSet.size < 2) { alert('Select at least 2 programs to compare.'); return; }
+  const progs = [...compareSet].map(k => programMap[k]).filter(Boolean);
+  buildCompareTable(progs);
+  document.getElementById('compare-modal').classList.add('open');
+}
+
+function closeCompareModal() { document.getElementById('compare-modal').classList.remove('open'); }
+function closeModalOutside(e) { if (e.target === document.getElementById('compare-modal')) closeCompareModal(); }
+
+function buildCompareTable(progs) {
+  // Find best values
+  const best1  = Math.max(...progs.map(p => p.median1  || 0));
+  const best5  = Math.max(...progs.map(p => p.median5  || 0));
+  const best10 = Math.max(...progs.map(p => p.median10 || 0));
+  const bestGr = Math.max(...progs.map(p => growth(p)));
+
+  const cols = progs.map((p, i) => `<th>${esc(p.program.slice(0,50))}<br><span style="font-size:11px;color:#8899cc">${esc(p.school)}</span></th>`).join('');
+
+  const row = (label, sublabel, fn) => {
+    const cells = progs.map(fn).join('');
+    return `<tr><td><div class="row-label">${label}</div>${sublabel ? `<div class="row-sublabel">${sublabel}</div>` : ''}</td>${cells}</tr>`;
+  };
+
+  const wageCell = (val, q1, q3, isBest) => {
+    if (!val) return `<td><span style="color:var(--muted)">N/A</span></td>`;
+    const cls = isBest ? ' class="best-cell"' : '';
+    return `<td${cls}><div class="big-wage">${fmt(val)}</div><div class="wage-range">${q1 ? fmt(q1) : '—'} – ${q3 ? fmt(q3) : '—'}</div></td>`;
+  };
+
+  const html = `
+    <table class="compare-table">
+      <thead><tr><th>Attribute</th>${cols}</tr></thead>
+      <tbody>
+        <tr class="section-header"><td colspan="${progs.length+1}">Program Info</td></tr>
+        ${row('School', '', p => `<td>${esc(p.school)}</td>`)}
+        ${row('Credential', '', p => `<td><span class="card-credential ${credClass(p.degree)}">${esc(p.degree)}</span></td>`)}
+        ${row('Field of Study', '', p => `<td>${esc(p.field || '—')}</td>`)}
+        ${row('CIP Code', '', p => `<td>${p.cipCode}</td>`)}
+        ${row('Completers (Yr 1)', '', p => `<td>${p.completers1 ? p.completers1.toLocaleString() : '—'}</td>`)}
+        <tr class="section-header"><td colspan="${progs.length+1}">Year 1 Earnings (1 yr after graduation)</td></tr>
+        ${progs.map((p, i) => '').join('')}
+        <tr><td><div class="row-label">Median Earnings</div><div class="row-sublabel">25th – 75th pct range</div></td>
+          ${progs.map(p => wageCell(p.median1, p.q1_1, p.q3_1, p.median1 === best1)).join('')}
+        </tr>
+        <tr class="section-header"><td colspan="${progs.length+1}">Year 5 Earnings</td></tr>
+        <tr><td><div class="row-label">Median Earnings</div><div class="row-sublabel">25th – 75th pct range</div></td>
+          ${progs.map(p => wageCell(p.median5, p.q1_5, p.q3_5, p.median5 === best5)).join('')}
+        </tr>
+        <tr class="section-header"><td colspan="${progs.length+1}">Year 10 Earnings</td></tr>
+        <tr><td><div class="row-label">Median Earnings</div><div class="row-sublabel">25th – 75th pct range</div></td>
+          ${progs.map(p => wageCell(p.median10, p.q1_10, p.q3_10, p.median10 === best10)).join('')}
+        </tr>
+        <tr class="section-header"><td colspan="${progs.length+1}">Wage Growth</td></tr>
+        ${row('Growth (Yr 1 → 10)', 'Absolute increase in median earnings', p => {
+          const g = growth(p); const isBest = g === bestGr;
+          const cls = isBest ? ' class="best-cell"' : '';
+          return `<td${cls}><div class="big-wage" style="${isBest ? 'color:var(--green)' : ''}">${g > 0 ? '+' : ''}${fmt(g)}</div></td>`;
+        })}
+      </tbody>
+    </table>`;
+
+  document.getElementById('compare-table-wrap').innerHTML = html;
+}
+
+// ─────────────────────────────────────────────
+//  INSIGHTS TAB
+// ─────────────────────────────────────────────
+function buildInsights() {
+  // Top 10 year 1
+  const yr1 = PROGRAMS.filter(p => p.median1).sort((a,b) => b.median1 - a.median1).slice(0,10);
+  document.getElementById('top-yr1').innerHTML = yr1.map((p,i) => rankItem(i, p, p.median1)).join('');
+
+  // Top 10 year 10
+  const yr10 = PROGRAMS.filter(p => p.median10).sort((a,b) => b.median10 - a.median10).slice(0,10);
+  document.getElementById('top-yr10').innerHTML = yr10.map((p,i) => rankItem(i, p, p.median10)).join('');
+
+  // Top growth
+  const topGrowth = PROGRAMS.filter(p => p.median1 && p.median10).sort((a,b) => growth(b) - growth(a)).slice(0,10);
+  document.getElementById('top-growth').innerHTML = topGrowth.map((p,i) => rankItem(i, p, growth(p), true)).join('');
+
+  // Field bars (year 5)
+  const fieldData = {};
+  PROGRAMS.filter(p => p.median5 && p.field).forEach(p => {
+    if (!fieldData[p.field]) fieldData[p.field] = [];
+    fieldData[p.field].push(p.median5);
+  });
+  const fieldAvgs = Object.entries(fieldData)
+    .map(([f, ws]) => ({ field: f, avg: median(ws) }))
+    .sort((a,b) => b.avg - a.avg);
+  const maxAvg = fieldAvgs[0]?.avg || 1;
+  document.getElementById('field-bars').innerHTML = fieldAvgs.map(f => `
+    <div class="trend-bar-wrap">
+      <div class="trend-label">
+        <span style="font-size:13px;font-weight:600">${esc(f.field)}</span>
+        <span style="font-weight:700;color:var(--blue)">${fmt(f.avg)}</span>
+      </div>
+      <div class="trend-bar"><div class="trend-fill" style="width:${Math.round(f.avg/maxAvg*100)}%"></div></div>
+    </div>`).join('');
+}
+
+function rankItem(i, p, val, isGrowth=false) {
+  return `<li>
+    <div class="rank-num ${i===0?'gold':''}">${i+1}</div>
+    <div class="rank-info">
+      <div class="rank-name" title="${esc(p.program)}">${esc(p.program)}</div>
+      <div class="rank-sub">${esc(p.school)} &middot; ${esc(p.degree)}</div>
+    </div>
+    <div class="rank-wage" style="${isGrowth?'color:var(--green)':''}">${isGrowth&&val>0?'+':''}${fmt(val)}</div>
+  </li>`;
+}
+
+// ─────────────────────────────────────────────
+//  TABS
+// ─────────────────────────────────────────────
+function switchTab(t) {
+  document.getElementById('tab-search').style.display   = t === 'search'   ? '' : 'none';
+  document.getElementById('tab-insights').style.display = t === 'insights' ? '' : 'none';
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', (i===0&&t==='search') || (i===1&&t==='insights'));
+  });
+  if (t === 'insights') buildInsights();
+}
+
+// ─────────────────────────────────────────────
+//  HELPERS
+// ─────────────────────────────────────────────
+function fmt(n) {
+  if (!n && n !== 0) return '—';
+  return '$' + Math.round(n).toLocaleString();
+}
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function credClass(d) {
+  if (!d) return 'cred-default';
+  if (d.includes('<1')) return 'cred-cert-short';
+  if (d.includes('>1')) return 'cred-cert-long';
+  if (d.includes('Applied Science')) return 'cred-aas';
+  if (d.includes('AA or AS') || d.includes('AA/AS')) return 'cred-aa';
+  if (d.includes('General Studies')) return 'cred-ags';
+  if (d.includes("Bachelor")) return 'cred-bach';
+  if (d.includes("Master")) return 'cred-master';
+  return 'cred-default';
+}
+function median(arr) {
+  if (!arr.length) return 0;
+  const s = [...arr].sort((a,b)=>a-b);
+  const m = Math.floor(s.length/2);
+  return s.length%2 ? s[m] : (s[m-1]+s[m])/2;
+}
+
+// ─────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────
+onSearch();
+</script>
+</body>
+</html>
