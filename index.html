@@ -277,6 +277,7 @@
 
     /* ── Insights Tab ── */
     #tab-insights { display: none; }
+    #tab-insights.active-tab { display: block; }
 
     /* Headline stat row */
     .headline-stats {
@@ -481,7 +482,7 @@
   </div><!-- /tab-search -->
 
   <!-- ── INSIGHTS TAB ── -->
-  <div id="tab-insights" style="display:none">
+  <div id="tab-insights">
 
     <!-- Headline numbers -->
     <div class="headline-stats">
@@ -921,7 +922,7 @@ let insightsBuilt = false;
 function buildInsights() {
   if (insightsBuilt) return;
   insightsBuilt = true;
-  try { _buildInsightsInner(); } catch(e) { console.error('Insights error:', e); }
+  _buildInsightsInner();
 }
 
 function _buildInsightsInner() {
@@ -1085,12 +1086,23 @@ function rankItem(i, p, val, isGrowth=false) {
 //  TABS
 // ─────────────────────────────────────────────
 function switchTab(t) {
-  document.getElementById('tab-search').style.display   = t === 'search'   ? '' : 'none';
-  document.getElementById('tab-insights').style.display = t === 'insights' ? '' : 'none';
-  document.querySelectorAll('.tab-btn').forEach((b,i) => {
-    b.classList.toggle('active', (i===0&&t==='search') || (i===1&&t==='insights'));
+  const searchEl   = document.getElementById('tab-search');
+  const insightsEl = document.getElementById('tab-insights');
+
+  if (t === 'search') {
+    searchEl.style.display   = '';
+    insightsEl.style.display = 'none';
+    insightsEl.classList.remove('active-tab');
+  } else {
+    searchEl.style.display   = 'none';
+    insightsEl.style.display = '';
+    insightsEl.classList.add('active-tab');
+    buildInsights();
+  }
+
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', (i === 0 && t === 'search') || (i === 1 && t === 'insights'));
   });
-  if (t === 'insights') buildInsights();
 }
 
 // ─────────────────────────────────────────────
@@ -1125,8 +1137,10 @@ function median(arr) {
 // ─────────────────────────────────────────────
 //  INIT
 // ─────────────────────────────────────────────
+// Start on Search tab; Insights builds lazily on first click
+document.getElementById('tab-insights').style.display = 'none';
+document.getElementById('tab-search').style.display   = '';
 onSearch();
-buildInsights();
 </script>
 </body>
 </html>
