@@ -277,10 +277,33 @@
 
     /* ── Insights Tab ── */
     #tab-insights { display: none; }
+
+    /* Headline stat row */
+    .headline-stats {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px;
+    }
+    @media (max-width: 900px) { .headline-stats { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 500px)  { .headline-stats { grid-template-columns: 1fr; } }
+    .headline-card {
+      background: white; border-radius: 12px; box-shadow: var(--card-shadow);
+      padding: 20px 22px; border-top: 4px solid var(--blue);
+    }
+    .headline-card.gold-top { border-top-color: var(--gold); }
+    .headline-card.green-top { border-top-color: var(--green); }
+    .headline-card.purple-top { border-top-color: #7c3aed; }
+    .headline-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; }
+    .headline-value { font-size: 30px; font-weight: 900; color: var(--text); line-height: 1; }
+    .headline-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .headline-delta { font-size: 13px; font-weight: 700; color: var(--green); margin-top: 4px; }
+
+    /* Main insights grid */
     .insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    @media (max-width: 700px) { .insights-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 860px) { .insights-grid { grid-template-columns: 1fr; } }
     .insight-card { background: white; border-radius: 12px; box-shadow: var(--card-shadow); padding: 24px; }
-    .insight-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--blue); }
+    .insight-card.full-width { grid-column: 1 / -1; }
+    .insight-card h3 { font-size: 15px; font-weight: 800; margin-bottom: 16px; color: var(--blue); display:flex; align-items:center; gap:8px; }
+
+    /* Rank lists */
     .rank-list { list-style: none; }
     .rank-list li {
       display: flex; align-items: center; gap: 12px;
@@ -292,15 +315,51 @@
       background: var(--light); display: flex; align-items: center; justify-content: center;
       font-size: 13px; font-weight: 800; color: var(--blue); flex-shrink: 0;
     }
-    .rank-num.gold { background: var(--gold); color: white; }
+    .rank-num.gold   { background: var(--gold); color: white; }
+    .rank-num.silver { background: #9ca3af; color: white; }
+    .rank-num.bronze { background: #b45309; color: white; }
     .rank-info { flex: 1; min-width: 0; }
     .rank-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .rank-sub { font-size: 12px; color: var(--muted); }
-    .rank-wage { font-size: 16px; font-weight: 800; color: var(--blue); flex-shrink: 0; }
-    .trend-bar-wrap { margin-bottom: 12px; }
-    .trend-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
-    .trend-bar { height: 10px; border-radius: 6px; background: var(--border); overflow: hidden; }
-    .trend-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--blue), #4f8ef7); transition: width 0.8s ease; }
+    .rank-sub  { font-size: 12px; color: var(--muted); }
+    .rank-wage { font-size: 15px; font-weight: 800; color: var(--blue); flex-shrink: 0; }
+
+    /* Horizontal bar chart */
+    .bar-chart-row { margin-bottom: 14px; }
+    .bar-chart-label { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+    .bar-chart-name  { font-size: 13px; font-weight: 600; color: var(--text); }
+    .bar-chart-val   { font-size: 13px; font-weight: 800; color: var(--blue); }
+    .bar-track { height: 10px; border-radius: 6px; background: var(--border); overflow: hidden; }
+    .bar-fill  { height: 100%; border-radius: 6px; transition: width 0.9s ease; }
+    .bar-fill.blue   { background: linear-gradient(90deg, var(--blue), #4f8ef7); }
+    .bar-fill.gold   { background: linear-gradient(90deg, var(--gold), #f0b840); }
+    .bar-fill.green  { background: linear-gradient(90deg, var(--green), #34d399); }
+    .bar-fill.purple { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+
+    /* Credential trajectory table */
+    .cred-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .cred-table th { padding: 10px 12px; background: var(--light); font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: right; border-bottom: 2px solid var(--border); }
+    .cred-table th:first-child { text-align: left; }
+    .cred-table td { padding: 11px 12px; border-bottom: 1px solid var(--border); text-align: right; }
+    .cred-table td:first-child { text-align: left; font-weight: 600; }
+    .cred-table tr:last-child td { border-bottom: none; }
+    .cred-table tr:hover td { background: #f8faff; }
+    .cred-arrow { font-size: 11px; color: var(--green); font-weight: 700; margin-left: 4px; }
+    .cred-badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700; }
+
+    /* Callout boxes */
+    .callout-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 20px; }
+    @media (max-width: 700px) { .callout-grid { grid-template-columns: 1fr; } }
+    .callout {
+      border-radius: 10px; padding: 18px 20px;
+      border-left: 4px solid var(--blue);
+      background: white; box-shadow: var(--card-shadow);
+    }
+    .callout.gold   { border-left-color: var(--gold); background: #fffdf5; }
+    .callout.green  { border-left-color: var(--green); background: #f0fdf4; }
+    .callout.purple { border-left-color: #7c3aed; background: #faf5ff; }
+    .callout-icon { font-size: 22px; margin-bottom: 6px; }
+    .callout-title { font-size: 13px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+    .callout-body  { font-size: 12px; color: var(--muted); line-height: 1.5; }
 
     /* ── Footer ── */
     footer {
@@ -423,23 +482,96 @@
 
   <!-- ── INSIGHTS TAB ── -->
   <div id="tab-insights" style="display:none">
+
+    <!-- Headline numbers -->
+    <div class="headline-stats">
+      <div class="headline-card">
+        <div class="headline-label">Programs Tracked</div>
+        <div class="headline-value" id="hl-programs">—</div>
+        <div class="headline-sub">across Colorado colleges</div>
+      </div>
+      <div class="headline-card gold-top">
+        <div class="headline-label">Statewide Median — Year 1</div>
+        <div class="headline-value" id="hl-med1">—</div>
+        <div class="headline-delta" id="hl-med1-delta"></div>
+      </div>
+      <div class="headline-card green-top">
+        <div class="headline-label">Statewide Median — Year 5</div>
+        <div class="headline-value" id="hl-med5">—</div>
+        <div class="headline-delta" id="hl-med5-delta"></div>
+      </div>
+      <div class="headline-card purple-top">
+        <div class="headline-label">Statewide Median — Year 10</div>
+        <div class="headline-value" id="hl-med10">—</div>
+        <div class="headline-delta" id="hl-med10-delta"></div>
+      </div>
+    </div>
+
+    <!-- Did You Know callouts -->
+    <div class="callout-grid">
+      <div class="callout gold">
+        <div class="callout-icon">&#128200;</div>
+        <div class="callout-title">STEM pays off long-term</div>
+        <div class="callout-body">STEM programs lead all fields with <strong>+61% wage growth</strong> from Year 1 to Year 10 — the highest growth rate of any field.</div>
+      </div>
+      <div class="callout green">
+        <div class="callout-icon">&#127891;</div>
+        <div class="callout-title">4-year degrees accelerate faster</div>
+        <div class="callout-body">Bachelor's &amp; graduate programs see median wages grow nearly <strong>2× faster</strong> than sub-associate certificates over 10 years.</div>
+      </div>
+      <div class="callout purple">
+        <div class="callout-icon">&#127970;</div>
+        <div class="callout-title">35 institutions represented</div>
+        <div class="callout-body">Data spans community colleges, state universities, and research institutions — giving a full picture of Colorado outcomes.</div>
+      </div>
+    </div>
+
+    <!-- Main 2-col grid -->
     <div class="insights-grid">
+
+      <!-- Top earners Year 1 -->
       <div class="insight-card">
-        <h3>&#127942; Top 10 Programs by Year 1 Earnings</h3>
+        <h3>&#127942; Top 10 Programs — Year 1 Earnings</h3>
         <ul class="rank-list" id="top-yr1"></ul>
       </div>
+
+      <!-- Top earners Year 10 -->
       <div class="insight-card">
-        <h3>&#128640; Top 10 Programs by Year 10 Earnings</h3>
+        <h3>&#128640; Top 10 Programs — Year 10 Earnings</h3>
         <ul class="rank-list" id="top-yr10"></ul>
       </div>
+
+      <!-- Highest growth -->
       <div class="insight-card">
-        <h3>&#128200; Highest Wage Growth (Yr 1 &#8594; 10)</h3>
+        <h3>&#128308; Highest Wage Growth &nbsp;<span style="font-size:12px;font-weight:500;color:var(--muted)">(Year 1 &rarr; 10)</span></h3>
         <ul class="rank-list" id="top-growth"></ul>
       </div>
+
+      <!-- Best ROI by field -->
       <div class="insight-card">
-        <h3>&#127979; Average Median Wage by Field (Year 5)</h3>
+        <h3>&#127979; Avg. Median Wage by Field <span style="font-size:12px;font-weight:500;color:var(--muted)">(Year 5)</span></h3>
         <div id="field-bars"></div>
       </div>
+
+      <!-- Credential wage trajectory — full width -->
+      <div class="insight-card full-width">
+        <h3>&#128203; Wage Trajectory by Credential Type</h3>
+        <table class="cred-table" id="cred-table"></table>
+        <p style="font-size:11px;color:var(--muted);margin-top:12px;">Medians computed from programs with sufficient data in each year cohort. Growth % = Year 10 vs Year 1.</p>
+      </div>
+
+      <!-- Avg wage by credential Year 1 -->
+      <div class="insight-card">
+        <h3>&#127891; Avg. Year 1 Wage by Credential</h3>
+        <div id="cred-bars-yr1"></div>
+      </div>
+
+      <!-- Field % growth bar chart -->
+      <div class="insight-card">
+        <h3>&#128200; Wage Growth % by Field &nbsp;<span style="font-size:12px;font-weight:500;color:var(--muted)">(Year 1 &rarr; 10)</span></h3>
+        <div id="field-growth-bars"></div>
+      </div>
+
     </div>
   </div>
 
@@ -784,47 +916,164 @@ function buildCompareTable(progs) {
 // ─────────────────────────────────────────────
 //  INSIGHTS TAB
 // ─────────────────────────────────────────────
+let insightsBuilt = false;
+
 function buildInsights() {
-  // Top 10 year 1
+  if (insightsBuilt) return;
+  insightsBuilt = true;
+
+  // ── Headline stats ──────────────────────────
+  const allM1  = PROGRAMS.filter(p => p.median1).map(p => p.median1);
+  const allM5  = PROGRAMS.filter(p => p.median5).map(p => p.median5);
+  const allM10 = PROGRAMS.filter(p => p.median10).map(p => p.median10);
+  const med1   = median(allM1);
+  const med5   = median(allM5);
+  const med10  = median(allM10);
+
+  document.getElementById('hl-programs').textContent = PROGRAMS.length.toLocaleString();
+  document.getElementById('hl-med1').textContent  = fmt(med1);
+  document.getElementById('hl-med5').textContent  = fmt(med5);
+  document.getElementById('hl-med10').textContent = fmt(med10);
+  document.getElementById('hl-med1-delta').textContent  = 'starting median wage';
+  document.getElementById('hl-med5-delta').textContent  = pctDelta(med1, med5)  + ' vs. Year 1';
+  document.getElementById('hl-med10-delta').textContent = pctDelta(med1, med10) + ' vs. Year 1';
+
+  // ── Top 10 Year 1 ───────────────────────────
   const yr1 = PROGRAMS.filter(p => p.median1).sort((a,b) => b.median1 - a.median1).slice(0,10);
   document.getElementById('top-yr1').innerHTML = yr1.map((p,i) => rankItem(i, p, p.median1)).join('');
 
-  // Top 10 year 10
+  // ── Top 10 Year 10 ──────────────────────────
   const yr10 = PROGRAMS.filter(p => p.median10).sort((a,b) => b.median10 - a.median10).slice(0,10);
   document.getElementById('top-yr10').innerHTML = yr10.map((p,i) => rankItem(i, p, p.median10)).join('');
 
-  // Top growth
+  // ── Highest absolute growth Yr1→10 ──────────
   const topGrowth = PROGRAMS.filter(p => p.median1 && p.median10).sort((a,b) => growth(b) - growth(a)).slice(0,10);
   document.getElementById('top-growth').innerHTML = topGrowth.map((p,i) => rankItem(i, p, growth(p), true)).join('');
 
-  // Field bars (year 5)
-  const fieldData = {};
+  // ── Field avg bars (Year 5) ──────────────────
+  const fieldData5 = {};
   PROGRAMS.filter(p => p.median5 && p.field).forEach(p => {
-    if (!fieldData[p.field]) fieldData[p.field] = [];
-    fieldData[p.field].push(p.median5);
+    (fieldData5[p.field] = fieldData5[p.field] || []).push(p.median5);
   });
-  const fieldAvgs = Object.entries(fieldData)
+  const fieldAvgs5 = Object.entries(fieldData5)
     .map(([f, ws]) => ({ field: f, avg: median(ws) }))
     .sort((a,b) => b.avg - a.avg);
-  const maxAvg = fieldAvgs[0]?.avg || 1;
-  document.getElementById('field-bars').innerHTML = fieldAvgs.map(f => `
-    <div class="trend-bar-wrap">
-      <div class="trend-label">
-        <span style="font-size:13px;font-weight:600">${esc(f.field)}</span>
-        <span style="font-weight:700;color:var(--blue)">${fmt(f.avg)}</span>
-      </div>
-      <div class="trend-bar"><div class="trend-fill" style="width:${Math.round(f.avg/maxAvg*100)}%"></div></div>
-    </div>`).join('');
+  const maxAvg5 = fieldAvgs5[0]?.avg || 1;
+  const fieldColors = ['blue','gold','green','purple','blue','gold','green','purple'];
+  document.getElementById('field-bars').innerHTML = fieldAvgs5.map((f,i) => barRow(
+    f.field, fmt(f.avg), Math.round(f.avg / maxAvg5 * 100), fieldColors[i % fieldColors.length]
+  )).join('');
+
+  // ── Field % growth bars ──────────────────────
+  const fieldData1  = {};
+  const fieldData10 = {};
+  PROGRAMS.filter(p => p.median1  && p.field).forEach(p => (fieldData1[p.field]  = fieldData1[p.field]  || []).push(p.median1));
+  PROGRAMS.filter(p => p.median10 && p.field).forEach(p => (fieldData10[p.field] = fieldData10[p.field] || []).push(p.median10));
+  const fieldGrowth = Object.keys(fieldData1)
+    .filter(f => fieldData10[f])
+    .map(f => {
+      const m1 = median(fieldData1[f]), m10 = median(fieldData10[f]);
+      return { field: f, pct: Math.round((m10 - m1) / m1 * 100) };
+    })
+    .sort((a,b) => b.pct - a.pct);
+  const maxPct = fieldGrowth[0]?.pct || 1;
+  document.getElementById('field-growth-bars').innerHTML = fieldGrowth.map((f,i) => barRow(
+    f.field, '+' + f.pct + '%', Math.round(f.pct / maxPct * 100), 'green'
+  )).join('');
+
+  // ── Credential trajectory table ──────────────
+  const credOrder = [
+    "Certificate(<1 year)",
+    "Certificate(>1 year)",
+    "Associate of Applied Science",
+    "Associate Degree(AA or AS)",
+    "Associate of General Studies",
+    "Bachelor's Degree",
+    "Master's Degree"
+  ];
+  const credShort = {
+    "Certificate(<1 year)":         "Certificate < 1 yr",
+    "Certificate(>1 year)":         "Certificate > 1 yr",
+    "Associate of Applied Science":  "AAS",
+    "Associate Degree(AA or AS)":    "AA / AS",
+    "Associate of General Studies":  "AGS",
+    "Bachelor's Degree":             "Bachelor's",
+    "Master's Degree":               "Master's"
+  };
+  const credColor = {
+    "Certificate(<1 year)":         "cred-cert-short",
+    "Certificate(>1 year)":         "cred-cert-long",
+    "Associate of Applied Science":  "cred-aas",
+    "Associate Degree(AA or AS)":    "cred-aa",
+    "Associate of General Studies":  "cred-ags",
+    "Bachelor's Degree":             "cred-bach",
+    "Master's Degree":               "cred-master"
+  };
+
+  const credRows = credOrder.map(cred => {
+    const p1  = PROGRAMS.filter(p => p.degree === cred && p.median1).map(p => p.median1);
+    const p5  = PROGRAMS.filter(p => p.degree === cred && p.median5).map(p => p.median5);
+    const p10 = PROGRAMS.filter(p => p.degree === cred && p.median10).map(p => p.median10);
+    if (!p1.length) return '';
+    const m1 = median(p1), m5 = median(p5), m10 = median(p10);
+    const growPct = m10 ? Math.round((m10 - m1) / m1 * 100) : null;
+    return `<tr>
+      <td><span class="cred-badge ${credColor[cred] || ''}">${esc(credShort[cred] || cred)}</span></td>
+      <td>${fmt(m1)}</td>
+      <td>${m5 ? fmt(m5) : '—'}</td>
+      <td>${m10 ? fmt(m10) : '—'}</td>
+      <td>${growPct !== null ? `<span style="color:var(--green);font-weight:700">+${growPct}%</span>` : '—'}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('cred-table').innerHTML = `
+    <thead>
+      <tr>
+        <th style="text-align:left">Credential</th>
+        <th>Year 1</th>
+        <th>Year 5</th>
+        <th>Year 10</th>
+        <th>Growth</th>
+      </tr>
+    </thead>
+    <tbody>${credRows}</tbody>`;
+
+  // ── Credential bars Year 1 ────────────────────
+  const credAvgs1 = credOrder.map(cred => {
+    const vals = PROGRAMS.filter(p => p.degree === cred && p.median1).map(p => p.median1);
+    return { cred: credShort[cred] || cred, avg: vals.length ? median(vals) : 0 };
+  }).filter(c => c.avg > 0).sort((a,b) => b.avg - a.avg);
+  const maxCred1 = credAvgs1[0]?.avg || 1;
+  document.getElementById('cred-bars-yr1').innerHTML = credAvgs1.map((c,i) =>
+    barRow(c.cred, fmt(c.avg), Math.round(c.avg / maxCred1 * 100), fieldColors[i % fieldColors.length])
+  ).join('');
+}
+
+function barRow(label, valStr, pct, colorClass) {
+  return `<div class="bar-chart-row">
+    <div class="bar-chart-label">
+      <span class="bar-chart-name">${esc(label)}</span>
+      <span class="bar-chart-val">${esc(valStr)}</span>
+    </div>
+    <div class="bar-track"><div class="bar-fill ${colorClass}" style="width:${pct}%"></div></div>
+  </div>`;
+}
+
+function pctDelta(base, val) {
+  if (!base || !val) return '';
+  const p = Math.round((val - base) / base * 100);
+  return (p > 0 ? '+' : '') + p + '%';
 }
 
 function rankItem(i, p, val, isGrowth=false) {
+  const numCls = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
   return `<li>
-    <div class="rank-num ${i===0?'gold':''}">${i+1}</div>
+    <div class="rank-num ${numCls}">${i+1}</div>
     <div class="rank-info">
       <div class="rank-name" title="${esc(p.program)}">${esc(p.program)}</div>
       <div class="rank-sub">${esc(p.school)} &middot; ${esc(p.degree)}</div>
     </div>
-    <div class="rank-wage" style="${isGrowth?'color:var(--green)':''}">${isGrowth&&val>0?'+':''}${fmt(val)}</div>
+    <div class="rank-wage" style="${isGrowth ? 'color:var(--green)' : ''}">${isGrowth && val > 0 ? '+' : ''}${fmt(val)}</div>
   </li>`;
 }
 
