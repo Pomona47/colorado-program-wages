@@ -921,6 +921,10 @@ let insightsBuilt = false;
 function buildInsights() {
   if (insightsBuilt) return;
   insightsBuilt = true;
+  try { _buildInsightsInner(); } catch(e) { console.error('Insights error:', e); }
+}
+
+function _buildInsightsInner() {
 
   // ── Headline stats ──────────────────────────
   const allM1  = PROGRAMS.filter(p => p.median1).map(p => p.median1);
@@ -1047,7 +1051,7 @@ function buildInsights() {
   document.getElementById('cred-bars-yr1').innerHTML = credAvgs1.map((c,i) =>
     barRow(c.cred, fmt(c.avg), Math.round(c.avg / maxCred1 * 100), fieldColors[i % fieldColors.length])
   ).join('');
-}
+} // end _buildInsightsInner
 
 function barRow(label, valStr, pct, colorClass) {
   return `<div class="bar-chart-row">
@@ -1122,6 +1126,7 @@ function median(arr) {
 //  INIT
 // ─────────────────────────────────────────────
 onSearch();
+buildInsights();
 </script>
 </body>
 </html>
